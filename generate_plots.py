@@ -96,55 +96,6 @@ def plot_timing_boxplot(results: dict, out_dir: str) -> str:
     return path
 
 
-def plot_timing_bar(results: dict, out_dir: str) -> str:
-    """Bar chart of median solve time with min/max error bars."""
-    solvers = _ok_solvers(results)
-    if not solvers:
-        return None
-
-    fig, ax = _fig(7, 4.5)
-
-    medians = []
-    mins    = []
-    maxs    = []
-    labels  = []
-    colours = []
-
-    for s in solvers:
-        v = results["solvers"][s]
-        med  = v.get("solve_time_median_ms", 0)
-        mn   = v.get("solve_time_min_ms", 0)
-        mx   = v.get("solve_time_max_ms", 0)
-        medians.append(med)
-        mins.append(med - mn)
-        maxs.append(mx - med)
-        labels.append(DISPLAY_NAMES.get(s, s))
-        colours.append(COLOURS.get(s, "#888"))
-
-    x = np.arange(len(solvers))
-    bars = ax.bar(x, medians, color=colours, alpha=0.85, zorder=3,
-                  error_kw=dict(ecolor="#333", capsize=5, elinewidth=1.5))
-    ax.errorbar(x, medians, yerr=[mins, maxs], fmt="none",
-                ecolor="#333", capsize=5, elinewidth=1.5, zorder=4)
-
-    ax.set_yscale("log")
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels, fontsize=10)
-    ax.set_ylabel("Median solve time  [ms]", fontsize=11)
-    ax.set_title("MPC solver: median solve time (log scale)", fontsize=12)
-    ax.yaxis.grid(True, linestyle="--", alpha=0.6)
-    ax.set_axisbelow(True)
-
-    # Annotate bars with values
-    for xi, med in zip(x, medians):
-        ax.text(xi, med * 1.4, f"{med:.3f}", ha="center", va="bottom",
-                fontsize=8, color="#333")
-
-    path = os.path.join(out_dir, "timing_bar.png")
-    _save(fig, path)
-    return path
-
-
 def plot_memory_bar(results: dict, out_dir: str) -> str:
     """Bar chart comparing compiled binary size (kB), with runtime deps stacked for acados."""
     solvers = _ok_solvers(results)
@@ -193,43 +144,6 @@ def plot_memory_bar(results: dict, out_dir: str) -> str:
     path = os.path.join(out_dir, "memory_bar.png")
     _save(fig, path)
     return path
-
-
-def plot_code_lines_bar(results: dict, out_dir: str) -> str:
-    """Bar chart comparing lines of generated C code."""
-    solvers = _ok_solvers(results)
-    if not solvers:
-        return None
-
-    fig, ax = _fig(7, 4.5)
-
-    lines   = []
-    labels  = []
-    colours = []
-
-    for s in solvers:
-        v = results["solvers"][s]
-        lines.append(v.get("code_lines", 0))
-        labels.append(DISPLAY_NAMES.get(s, s))
-        colours.append(COLOURS.get(s, "#888"))
-
-    x = np.arange(len(solvers))
-    ax.bar(x, lines, color=colours, alpha=0.85, zorder=3)
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels, fontsize=10)
-    ax.set_ylabel("Lines of generated C code", fontsize=11)
-    ax.set_title("Generated code complexity (line count)", fontsize=12)
-    ax.yaxis.grid(True, linestyle="--", alpha=0.6)
-    ax.set_axisbelow(True)
-
-    for xi, n in zip(x, lines):
-        ax.text(xi, n * 1.02, f"{n:,}", ha="center", va="bottom",
-                fontsize=8, color="#333")
-
-    path = os.path.join(out_dir, "code_lines_bar.png")
-    _save(fig, path)
-    return path
-
 
 def plot_trajectories(results: dict, out_dir: str, prob_name: str) -> str:
     """Closed-loop state trajectories for all successful solvers."""
@@ -398,7 +312,7 @@ def plot_scaling_time(scaling: dict, out_dir: str) -> str | None:
     ax.set_ylabel("Median solve time [ms]", fontsize=11)
     ax.set_title("Solve time scaling with horizon (median)", fontsize=12)
     ax.set_yscale("log")
-    ax.legend(fontsize=9)
+    ax.legend(fontsize=9,loc='upper left')
     ax.yaxis.grid(True, linestyle="--", alpha=0.5)
     ax.xaxis.grid(True, linestyle="--", alpha=0.25)
     ax.spines[["top", "right"]].set_visible(False)
@@ -484,10 +398,8 @@ def main(results_path: str = None, plots_dir: str = None):
 
     print("\nGenerating plots...")
     plot_timing_boxplot(results, plots_dir)
-    plot_timing_bar(results, plots_dir)
     plot_timing_cumulative(results, plots_dir)
     plot_memory_bar(results, plots_dir)
-    plot_code_lines_bar(results, plots_dir)
     plot_trajectories(results, plots_dir, results.get("problem", ""))
     if results.get("scaling"):
         plot_scaling_time(results["scaling"], plots_dir)
