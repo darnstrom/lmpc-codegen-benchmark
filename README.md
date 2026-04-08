@@ -87,8 +87,8 @@ uv run python run_all.py \
   --solvers lmpc casadi cvxpygen acados tinympc \
   --results-dir results
 python stm32_benchmark.py prepare \
-  --codegen-root /home/runner/work/lmpc-codegen-benchmark/lmpc-codegen-benchmark/codegen \
-  --output-dir /home/runner/work/lmpc-codegen-benchmark/lmpc-codegen-benchmark/stm32_benchmark
+  --codegen-root codegen \
+  --output-dir stm32_benchmark
 ```
 
 The helper writes:
@@ -108,16 +108,16 @@ The helper writes:
    - prints one CSV row with `solver`, run counts, and timing statistics.
 4. Build one firmware image per solver and save the size report, for example:
    ```bash
-   arm-none-eabi-size build/lmpc.elf > stm32_benchmark/measurements/lmpc.size
+arm-none-eabi-size build/lmpc.elf > stm32_benchmark/measurements/lmpc.size
    ```
 5. Copy the measured timing values into `stm32_benchmark/timings_template.csv`.
 6. Summarize the combined timing and size data:
    ```bash
-   python stm32_benchmark.py summarize \
-     --manifest /home/runner/work/lmpc-codegen-benchmark/lmpc-codegen-benchmark/stm32_benchmark/manifest.json \
-     --timings /home/runner/work/lmpc-codegen-benchmark/lmpc-codegen-benchmark/stm32_benchmark/timings_template.csv \
-     --size-dir /home/runner/work/lmpc-codegen-benchmark/lmpc-codegen-benchmark/stm32_benchmark/measurements \
-     --output-dir /home/runner/work/lmpc-codegen-benchmark/lmpc-codegen-benchmark/stm32_benchmark
+python stm32_benchmark.py summarize \
+     --manifest stm32_benchmark/manifest.json \
+     --timings stm32_benchmark/timings_template.csv \
+     --size-dir stm32_benchmark/measurements \
+     --output-dir stm32_benchmark
    ```
 
 This produces `summary.json`, `summary.csv`, and a console table with `solve_mean_us`, `solve_max_us`, `flash_bytes`, and `ram_bytes`.
