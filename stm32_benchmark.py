@@ -85,7 +85,7 @@ class SolverArtifacts:
     include_dirs: list[Path]
     notes: str
 
-    def to_json(self) -> dict:
+    def to_dict(self) -> dict:
         return {
             "solver": self.solver,
             "codegen_dir": str(self.codegen_dir),
@@ -221,11 +221,14 @@ def _build_compile_script(
         if artifact.sources:
             for source in artifact.sources:
                 obj_name = source.name.rsplit(".", 1)[0] + ".o"
+                command = (
+                    f'  {compiler} "${{COMMON_FLAGS[@]}}" "${{SOLVER_FLAGS[@]}}" {extra_flags} '
+                    f'-c {shlex.quote(str(source))} -o "$BUILD_ROOT/{artifact.solver}/{obj_name}"'
+                )
                 lines.extend(
                     [
                         f'  echo "[compile] {artifact.solver} :: {source}"',
-                        f'  {compiler} "${{COMMON_FLAGS[@]}}" "${{SOLVER_FLAGS[@]}}" {extra_flags} '
-                        f'-c {shlex.quote(str(source))} -o "$BUILD_ROOT/{artifact.solver}/{obj_name}"',
+                        command,
                     ]
                 )
         else:
@@ -290,7 +293,7 @@ def command_prepare(args: argparse.Namespace) -> int:
             "float_abi": args.float_abi,
         },
         "codegen_root": str(codegen_root),
-        "solvers": [artifact.to_json() for artifact in artifacts],
+        "solvers": [artifact.to_dict() for artifact in artifacts],
         "missing_solvers": [
             solver
             for solver in args.solvers
@@ -494,10 +497,11 @@ def command_summarize(args: argparse.Namespace) -> int:
                 "bss_bytes",
                 "notes",
             ],
+            extrasaction="ignore",
         )
         writer.writeheader()
         for row in rows:
-            writer.writerow({key: row.get(key) for key in writer.fieldnames})
+            writer.writerow(row)
 
     print(_markdown_table(rows))
     print(f"\nWrote {output_dir / 'summary.json'}")
