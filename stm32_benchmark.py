@@ -157,6 +157,10 @@ def _build_compile_script(
         "set -euo pipefail",
         "",
         'TOOLCHAIN_PREFIX="${TOOLCHAIN_PREFIX:-arm-none-eabi-}"',
+        'case "$TOOLCHAIN_PREFIX" in',
+        '  *-) ;;',
+        '  *) TOOLCHAIN_PREFIX="${TOOLCHAIN_PREFIX}-" ;;',
+        "esac",
         'CC="${TOOLCHAIN_PREFIX}gcc"',
         'CXX="${TOOLCHAIN_PREFIX}g++"',
         'BUILD_ROOT="${BUILD_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/object_build}"',
@@ -363,7 +367,7 @@ def _parse_size_sections(text: str) -> dict[str, int]:
     section_bytes: dict[str, int] = {}
 
     for line in text.splitlines():
-        match = re.match(r"^([.\w$]+)\s+(\d+)(?:\s+0x[0-9a-fA-F]+)?\s*$", line.strip())
+        match = re.match(r"^([\w.$]+)\s+(\d+)(?:\s+0x[0-9a-fA-F]+)?\s*$", line.strip())
         if not match:
             continue
         name = match.group(1)

@@ -108,7 +108,8 @@ The helper writes:
    - prints one CSV row with `solver`, run counts, and timing statistics.
 4. Build one firmware image per solver and save the size report, for example:
    ```bash
-arm-none-eabi-size build/lmpc.elf > stm32_benchmark/measurements/lmpc.size
+   mkdir -p stm32_benchmark/measurements
+   arm-none-eabi-size build/lmpc.elf > stm32_benchmark/measurements/lmpc.size
    ```
 5. Copy the measured timing values into `stm32_benchmark/timings_template.csv`.
 6. Summarize the combined timing and size data:
