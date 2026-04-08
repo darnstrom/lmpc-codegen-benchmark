@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Helpers for preparing and summarising on-target STM32 benchmark runs.
+Helpers for preparing and summarizing on-target STM32 benchmark runs.
 
 Typical workflow:
   1. Generate solver code with run_all.py / benchmark.py.
