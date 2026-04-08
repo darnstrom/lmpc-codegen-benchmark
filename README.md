@@ -77,3 +77,55 @@ uv run python generate_plot.py \
   --plots-dir results/plots \
 ```
 
+## STM32F411 on-target benchmarking workflow
+
+To compare solve time and firmware footprint on an STM32F411, first generate the solver code on the host:
+
+```bash
+uv run python run_all.py \
+  --problem inverted_pendulum \
+  --solvers lmpc casadi cvxpygen acados tinympc \
+  --results-dir results
+python stm32_benchmark.py prepare \
+  --codegen-root /home/runner/work/lmpc-codegen-benchmark/lmpc-codegen-benchmark/codegen \
+  --output-dir /home/runner/work/lmpc-codegen-benchmark/lmpc-codegen-benchmark/stm32_benchmark
+```
+
+The helper writes:
+
+- `stm32_benchmark/manifest.json`: generated source files, include directories, language, and solver notes
+- `stm32_benchmark/compile_codegen_objects.sh`: ARM cross-compile helper for object-only checks
+- `stm32_benchmark/timings_template.csv`: template for the measurements collected on the board
+
+### What you still need to do on the STM32 side
+
+1. Install an ARM embedded toolchain (`arm-none-eabi-gcc`) and create an STM32F411 firmware project (CubeIDE, CMake, or Make-based is fine).
+2. For each solver, import the source files and include directories listed in `manifest.json`.
+3. Add a thin benchmark harness that:
+   - initializes the generated solver,
+   - runs a few warm-up solves,
+   - measures repeated solves with the DWT cycle counter or another cycle-accurate timer,
+   - prints one CSV row with `solver`, run counts, and timing statistics.
+4. Build one firmware image per solver and save the size report, for example:
+   ```bash
+   arm-none-eabi-size build/lmpc.elf > stm32_benchmark/measurements/lmpc.size
+   ```
+5. Copy the measured timing values into `stm32_benchmark/timings_template.csv`.
+6. Summarize the combined timing and size data:
+   ```bash
+   python stm32_benchmark.py summarize \
+     --manifest /home/runner/work/lmpc-codegen-benchmark/lmpc-codegen-benchmark/stm32_benchmark/manifest.json \
+     --timings /home/runner/work/lmpc-codegen-benchmark/lmpc-codegen-benchmark/stm32_benchmark/timings_template.csv \
+     --size-dir /home/runner/work/lmpc-codegen-benchmark/lmpc-codegen-benchmark/stm32_benchmark/measurements \
+     --output-dir /home/runner/work/lmpc-codegen-benchmark/lmpc-codegen-benchmark/stm32_benchmark
+   ```
+
+This produces `summary.json`, `summary.csv`, and a console table with `solve_mean_us`, `solve_max_us`, `flash_bytes`, and `ram_bytes`.
+
+### Solver-specific caveats
+
+- `lmpc`: usually the easiest bare-metal target because the generated output is plain C.
+- `casadi`: also plain C, but generated code size can be large.
+- `cvxpygen`: import the whole generated subtree because the runtime support code lives inside it.
+- `tinympc`: generated output is C++, so compile it with the C++ toolchain path in your firmware project.
+- `acados`: depends on acados/BLASFEO/HPIPM runtime code; on STM32F411 it may need a custom reduced build or may exceed practical memory limits.
