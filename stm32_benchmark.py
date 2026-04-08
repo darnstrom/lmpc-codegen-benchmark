@@ -156,7 +156,7 @@ def _build_compile_script(
         "#!/usr/bin/env bash",
         "set -euo pipefail",
         "",
-        'TOOLCHAIN_PREFIX="${TOOLCHAIN_PREFIX:-arm-none-eabi-}"',
+        'TOOLCHAIN_PREFIX="${TOOLCHAIN_PREFIX:-arm-none-eabi}"',
         'case "$TOOLCHAIN_PREFIX" in',
         '  *-) ;;',
         '  *) TOOLCHAIN_PREFIX="${TOOLCHAIN_PREFIX}-" ;;',
@@ -166,6 +166,10 @@ def _build_compile_script(
         'BUILD_ROOT="${BUILD_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/object_build}"',
         'EXTRA_CFLAGS="${EXTRA_CFLAGS:-}"',
         'EXTRA_CXXFLAGS="${EXTRA_CXXFLAGS:-}"',
+        'EXTRA_CFLAGS_ARRAY=()',
+        'EXTRA_CXXFLAGS_ARRAY=()',
+        'if [[ -n "$EXTRA_CFLAGS" ]]; then read -r -a EXTRA_CFLAGS_ARRAY <<< "$EXTRA_CFLAGS"; fi',
+        'if [[ -n "$EXTRA_CXXFLAGS" ]]; then read -r -a EXTRA_CXXFLAGS_ARRAY <<< "$EXTRA_CXXFLAGS"; fi',
         'TARGET_SOLVER="${1:-all}"',
         "",
         "COMMON_FLAGS=(",
@@ -200,7 +204,7 @@ def _build_compile_script(
 
     for artifact in artifacts:
         compiler = "$CXX" if artifact.language == "c++" else "$CC"
-        extra_flags = "$EXTRA_CXXFLAGS" if artifact.language == "c++" else "$EXTRA_CFLAGS"
+        extra_flags = '"${EXTRA_CXXFLAGS_ARRAY[@]}"' if artifact.language == "c++" else '"${EXTRA_CFLAGS_ARRAY[@]}"'
         stdflag = "-std=c++17" if artifact.language == "c++" else "-std=c11"
         lines.extend(
             [

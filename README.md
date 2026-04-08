@@ -86,7 +86,7 @@ uv run python run_all.py \
   --problem inverted_pendulum \
   --solvers lmpc casadi cvxpygen acados tinympc \
   --results-dir results
-python stm32_benchmark.py prepare \
+uv run python stm32_benchmark.py prepare \
   --codegen-root codegen \
   --output-dir stm32_benchmark
 ```
@@ -114,7 +114,7 @@ The helper writes:
 5. Copy the measured timing values into `stm32_benchmark/timings_template.csv`.
 6. Summarize the combined timing and size data:
    ```bash
-python stm32_benchmark.py summarize \
+   uv run python stm32_benchmark.py summarize \
      --manifest stm32_benchmark/manifest.json \
      --timings stm32_benchmark/timings_template.csv \
      --size-dir stm32_benchmark/measurements \
