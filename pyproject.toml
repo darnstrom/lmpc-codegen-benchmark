@@ -1,0 +1,24 @@
+[project]
+name = "compare-lmpc"
+version = "0.1.0"
+description = "Benchmark harness for comparing LinearMPC and related MPC solver backends."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "acados-template",
+    "casadi==3.7.2",
+    "cvxpy==1.8.2",
+    "cvxpygen==0.7.0",
+    "lmpc==0.6.0",
+    "matplotlib==3.10.8",
+    "numpy==2.4.4",
+    "scipy==1.17.1",
+    "tinympc==0.0.7",
+]
+
+[tool.uv]
+package = false
+override-dependencies = ["scipy==1.17.1"]
+
+[tool.uv.sources]
+acados-template = { git = "https://github.com/acados/acados.git", rev = "47b961bcaf493de59048918ffaa585181466ea65", subdirectory = "interfaces/acados_template" }
