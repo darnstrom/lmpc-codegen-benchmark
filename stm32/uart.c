@@ -1,12 +1,12 @@
 /*
- * USART2 driver — PA2 (TX) / PA3 (RX), 115 200 Bd, 8N1.
+ * USART2 driver -- PA2 (TX) / PA3 (RX), 115 200 Bd, 8N1.
  *
  * APB1 clock = 48 MHz (PCLK1 after the /2 prescaler applied in startup.c).
- * BRR  = 48 000 000 / (16 × 115 200) = 26.04 → mantissa 26, fraction 1
- *        → BRR register value 0x1A1 (26<<4 | 1)
- * Actual baud ≈ 48 000 000 / (16 × 26.0625) = 115 108 Bd  (error < 0.1 %).
+ * BRR  = 48 000 000 / (16 * 115 200) = 26.04 -> mantissa 26, fraction 1
+ *        -> BRR register value 0x1A1 (26<<4 | 1)
+ * Actual baud ~= 48 000 000 / (16 * 26.0625) = 115 108 Bd  (error < 0.1 %).
  *
- * No interrupts or DMA — purely polling.  Transmit throughput is ≈ 11.5 kB/s
+ * No interrupts or DMA -- purely polling.  Transmit throughput is ~= 11.5 kB/s
  * which is more than enough for the small CSV lines emitted by bench_main.c.
  */
 
@@ -36,7 +36,7 @@ void uart_init(void)
     RCC_AHB1ENR |= (1u << 0);
     RCC_APB1ENR |= (1u << 17);
 
-    /* PA2 and PA3 → alternate-function mode (MODER bits [5:4] and [7:6] = 10). */
+    /* PA2 and PA3 -> alternate-function mode (MODER bits [5:4] and [7:6] = 10). */
     GPIOA_MODER &= ~((3u << 4) | (3u << 6));
     GPIOA_MODER |=  ((2u << 4) | (2u << 6));
 

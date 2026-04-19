@@ -1,5 +1,5 @@
 /*
- * Minimal startup code for STM32F411xE — no CMSIS device library required.
+ * Minimal startup code for STM32F411xE -- no CMSIS device library required.
  *
  * Responsibilities:
  *   1. Configure the PLL for 96 MHz from the 16 MHz HSI oscillator.
@@ -10,8 +10,8 @@
  *   6. Provide the complete STM32F411 interrupt vector table with weak default handlers.
  *
  * Peripheral pin-out assumed by uart.c (USART2 at 115 200 Bd):
- *   PA2 → USART2_TX  (connected to ST-LINK VCP on Nucleo-F411RE)
- *   PA3 → USART2_RX
+ *   PA2 -> USART2_TX  (connected to ST-LINK VCP on Nucleo-F411RE)
+ *   PA3 -> USART2_RX
  */
 
 #include <stdint.h>
@@ -34,7 +34,7 @@ int main(void);
 
 /* -------------------------------------------------------------------------
  * Minimal register definitions for clock setup
- * (RCC + Flash interface — no full CMSIS header needed)
+ * (RCC + Flash interface -- no full CMSIS header needed)
  * ---------------------------------------------------------------------- */
 #define RCC_CR      (*(volatile uint32_t *)0x40023800u)
 #define RCC_PLLCFGR (*(volatile uint32_t *)0x40023804u)
@@ -44,15 +44,15 @@ int main(void);
 /*
  * clock_init_96mhz()
  *
- * Configure PLL: HSI(16 MHz) → VCO(192 MHz) → SYSCLK(96 MHz)
- *   PLLM = 8  → VCO input = 2 MHz
- *   PLLN = 96 → VCO output = 192 MHz
- *   PLLP = 2  → SYSCLK = 96 MHz
- *   PLLQ = 4  → USB/SDIO clock = 48 MHz
+ * Configure PLL: HSI(16 MHz) -> VCO(192 MHz) -> SYSCLK(96 MHz)
+ *   PLLM = 8  -> VCO input = 2 MHz
+ *   PLLN = 96 -> VCO output = 192 MHz
+ *   PLLP = 2  -> SYSCLK = 96 MHz
+ *   PLLQ = 4  -> USB/SDIO clock = 48 MHz
  * Bus prescalers:
- *   AHB  /1 → HCLK   = 96 MHz
- *   APB1 /2 → PCLK1  = 48 MHz  (USART2 clock)
- *   APB2 /1 → PCLK2  = 96 MHz
+ *   AHB  /1 -> HCLK   = 96 MHz
+ *   APB1 /2 -> PCLK1  = 48 MHz  (USART2 clock)
+ *   APB2 /1 -> PCLK2  = 96 MHz
  */
 static void clock_init_96mhz(void)
 {
@@ -75,7 +75,7 @@ static void clock_init_96mhz(void)
     /*             PLLSRC[22]=0 (HSI), PLLQ[27:24]=4                    */
     RCC_PLLCFGR = (8u  <<  0)   /* PLLM  */
                 | (96u <<  6)   /* PLLN  */
-                | (0u  << 16)   /* PLLP=00 → ÷2  */
+                | (0u  << 16)   /* PLLP=00 -> /2  */
                 | (0u  << 22)   /* PLLSRC = HSI  */
                 | (4u  << 24);  /* PLLQ  */
 
@@ -95,7 +95,7 @@ static void clock_init_96mhz(void)
 }
 
 /* -------------------------------------------------------------------------
- * Reset handler — entry point from the vector table
+ * Reset handler -- entry point from the vector table
  * ---------------------------------------------------------------------- */
 void Reset_Handler(void)
 {
@@ -130,7 +130,7 @@ void Reset_Handler(void)
 }
 
 /* -------------------------------------------------------------------------
- * Default weak interrupt handler — infinite loop so a fault is visible.
+ * Default weak interrupt handler -- infinite loop so a fault is visible.
  * ---------------------------------------------------------------------- */
 void Default_Handler(void) { while (1) {} }
 
@@ -208,7 +208,7 @@ WEAK_ALIAS(SPI4_IRQHandler);
 WEAK_ALIAS(SPI5_IRQHandler);
 
 /* -------------------------------------------------------------------------
- * Vector table — must be placed at 0x08000000 (first word in Flash).
+ * Vector table -- must be placed at 0x08000000 (first word in Flash).
  * ---------------------------------------------------------------------- */
 typedef void (*irq_handler_t)(void);
 

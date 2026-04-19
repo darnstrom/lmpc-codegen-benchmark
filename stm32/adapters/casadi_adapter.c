@@ -1,5 +1,5 @@
 /*
- * casadi_adapter.c — solver_adapter.h implementation for the CasADi qrqp codegen.
+ * casadi_adapter.c -- solver_adapter.h implementation for the CasADi qrqp codegen.
  *
  * CasADi's code generator (CodeGenerator) produces a self-contained C file
  * "casadi_mpc.c" that implements the function "mpc_qp_cg" following CasADi's
@@ -9,22 +9,22 @@
  *                 casadi_int *iw, casadi_real *w, void *mem);
  *
  * Helper queries also generated in casadi_mpc.c:
- *   casadi_int mpc_qp_cg_sz_arg(void);   — number of arg pointers
- *   casadi_int mpc_qp_cg_sz_res(void);   — number of res pointers
- *   casadi_int mpc_qp_cg_sz_iw(void);    — integer work array length
- *   casadi_int mpc_qp_cg_sz_w(void);     — real work array length
+ *   casadi_int mpc_qp_cg_sz_arg(void);   -- number of arg pointers
+ *   casadi_int mpc_qp_cg_sz_res(void);   -- number of res pointers
+ *   casadi_int mpc_qp_cg_sz_iw(void);    -- integer work array length
+ *   casadi_int mpc_qp_cg_sz_w(void);     -- real work array length
  *
  * Input slots (qpsol convention):
- *   arg[0] = x0     — initial primal guess  (NZ_CASADI doubles, may be NULL)
- *   arg[1] = p      — parameters            ([xi0 (NA); r (NY)] = NA+NY doubles)
- *   arg[2] = lbx    — lower bounds on z     (NZ_CASADI doubles)
- *   arg[3] = ubx    — upper bounds on z     (NZ_CASADI doubles)
- *   arg[4] = lbg    — lower bounds on g     (NG_CASADI doubles)
- *   arg[5] = ubg    — upper bounds on g     (NG_CASADI doubles)
+ *   arg[0] = x0     -- initial primal guess  (NZ_CASADI doubles, may be NULL)
+ *   arg[1] = p      -- parameters            ([xi0 (NA); r (NY)] = NA+NY doubles)
+ *   arg[2] = lbx    -- lower bounds on z     (NZ_CASADI doubles)
+ *   arg[3] = ubx    -- upper bounds on z     (NZ_CASADI doubles)
+ *   arg[4] = lbg    -- lower bounds on g     (NG_CASADI doubles)
+ *   arg[5] = ubg    -- upper bounds on g     (NG_CASADI doubles)
  *
  * Output slots:
- *   res[0] = x      — primal solution dZ*   (NZ_CASADI doubles)
- *   res[1..4]       — cost, g, lam_x, lam_g (may be NULL)
+ *   res[0] = x      -- primal solution dZ*   (NZ_CASADI doubles)
+ *   res[1..4]       -- cost, g, lam_x, lam_g (may be NULL)
  *
  * For the benchmark all inputs are constant (fixed x0, r, u_prev=0), so they
  * are pre-filled in solver_init() and reused across timed calls.
@@ -42,7 +42,7 @@ typedef double    casadi_real;
 typedef long long casadi_int;
 
 /*
- * Include the generated header — it declares mpc_qp_cg, mpc_qp_cg_sz_*, etc.
+ * Include the generated header -- it declares mpc_qp_cg, mpc_qp_cg_sz_*, etc.
  * The codegen directory is added to the include path by CMakeLists.txt.
  */
 #include "casadi_mpc.h"
@@ -114,7 +114,7 @@ void solver_init(void)
 #endif
 
     /* ---- Wire up the pointer arrays ---- */
-    s_arg[0] = NULL;      /* x0 initial guess — let the solver choose */
+    s_arg[0] = NULL;      /* x0 initial guess -- let the solver choose */
     s_arg[1] = s_p;
     s_arg[2] = s_lbx;
     s_arg[3] = s_ubx;
@@ -122,10 +122,10 @@ void solver_init(void)
     s_arg[5] = s_ubg;
 
     s_res[0] = s_sol;     /* primal solution */
-    s_res[1] = NULL;      /* objective value — not needed */
-    s_res[2] = NULL;      /* constraint values — not needed */
-    s_res[3] = NULL;      /* lam_x — not needed */
-    s_res[4] = NULL;      /* lam_g — not needed */
+    s_res[1] = NULL;      /* objective value -- not needed */
+    s_res[2] = NULL;      /* constraint values -- not needed */
+    s_res[3] = NULL;      /* lam_x -- not needed */
+    s_res[4] = NULL;      /* lam_g -- not needed */
 }
 
 int solver_step(const double *x0, const double *r,
